@@ -1,0 +1,12 @@
+{
+  "name": "puppetfinland-ssh",
+  "version": "0.1.0",
+  "author": "Puppet-Finland team",
+  "license": "BSD license",
+  "summary": "Setup ssh",
+  "source": "https://github.com/Puppet-Finland/ssh.git",
+  "project_page": "https://github.com/Puppet-Finland/ssh",
+  "dependencies": [
+    { "name": "puppetfinland/os", "version_requirement": ">= 0.5.6" }
+  ]
+}
