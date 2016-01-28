@@ -25,8 +25,14 @@ define ssh::userconfig
         default => "${::os::params::home}/${system_user}/.ssh",
     }
 
+    $basedir_ensure = $ensure ? {
+        'present' => 'directory',
+        'absent'  => 'absent',
+        default   => undef,
+    }
+
     file { "ssh-${basedir}":
-        ensure => $ensure,
+        ensure => $basedir_ensure,
         name   => $basedir,
         owner  => $system_user,
         group  => $system_user,
