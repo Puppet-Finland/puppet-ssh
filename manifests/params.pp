@@ -14,6 +14,9 @@ class ssh::params {
         'Debian': {
             $package_name = 'openssh-client'
         }
+        'windows': {
+            # Nothing here at the moment, but we don't want the module to fail on Windows
+        }
         default: {
             fail("Unsupported OS: ${::osfamily}")
         }

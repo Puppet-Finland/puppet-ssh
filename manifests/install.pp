@@ -4,7 +4,7 @@
 #
 class ssh::install
 (
-    $ensure
+    Enum['present','absent'] $ensure
 
 ) inherits ssh::params
 {

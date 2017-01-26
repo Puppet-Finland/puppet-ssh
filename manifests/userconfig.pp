@@ -13,16 +13,26 @@
 #
 define ssh::userconfig
 (
-    $system_user = $title,
-    $ensure = 'present',
-    $keys = {}
+    String                   $system_user = $title,
+    Enum['present','absent'] $ensure = 'present',
+    Hash                     $keys = {}
 )
 {
     include ::ssh::params
 
-    $basedir = $system_user ? {
-        'root' => '/root/.ssh',
-        default => "${::os::params::home}/${system_user}/.ssh",
+    if $::kernel == 'windows' {
+        $basedir = "C:\\Users\\${system_user}\\.ssh"
+        $owner = undef
+        $group = undef
+        $mode = undef
+    } else {
+        $basedir = $system_user ? {
+            'root' => '/root/.ssh',
+            default => "${::os::params::home}/${system_user}/.ssh",
+        }
+        $owner = $system_user
+        $group = $system_user
+        $mode = '0700'
     }
 
     $basedir_ensure = $ensure ? {
@@ -34,9 +44,9 @@ define ssh::userconfig
     file { "ssh-${basedir}":
         ensure => $basedir_ensure,
         name   => $basedir,
-        owner  => $system_user,
-        group  => $system_user,
-        mode   => '0700',
+        owner  => $owner,
+        group  => $group,
+        mode   => $mode,
     }
 
     $defaults = {

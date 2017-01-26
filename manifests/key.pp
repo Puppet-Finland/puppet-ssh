@@ -27,23 +27,35 @@ define ssh::key
 {
     include ::ssh::params
 
-    $key_mode = $secret ? {
-        true => '0600',
-        false => '0644',
-        default => '0600',
+    if $::kernel == 'windows' {
+        $key_mode = undef
+        $owner = undef
+        $group = undef
+    } else {
+        $key_mode = $secret ? {
+            true => '0600',
+            false => '0644',
+            default => '0600',
+        }
+        $owner = $system_user
+        $group = $system_user
     }
 
-    $basedir = $system_user ? {
-        'root' => '/root/.ssh',
-        default => "${::os::params::home}/${system_user}/.ssh",
+    if $::kernel == 'windows' {
+        $key_name = "C:\\Users\\${system_user}\\.ssh\\${basename}"
+    } else {
+        $key_name = $system_user ? {
+            'root' => "/root/.ssh/${basename}",
+            default => "${::os::params::home}/${system_user}/.ssh/${basename}",
+        }
     }
 
     file { "ssh-key-${title}":
         ensure => $ensure,
-        name   => "${basedir}/${basename}",
+        name   => $key_name,
         source => "puppet:///files/ssh-${title}",
-        owner  => $system_user,
-        group  => $system_user,
+        owner  => $owner,
+        group  => $group,
         mode   => $key_mode,
     }
 }
