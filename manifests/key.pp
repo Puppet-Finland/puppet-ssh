@@ -16,15 +16,23 @@
 # [*secret*]
 #   Whether this key should be private (mode => '0600') or public (mode => 
 #   '0644'). Valid values are true (default) and false.
+# [*source_base*]
+#   The base path to the source. E.g. 'puppet:///files' or 'puppet:///modules/profile'.
 #
 define ssh::key
 (
-    $ensure,
-    $system_user,
-    $basename,
-    $secret = true
+    Enum['present', 'absent'] $ensure,
+    String                    $system_user,
+    String                    $basename,
+    Boolean                   $secret = true,
+    Optional[String]          $source_base
 )
 {
+    $l_source_base = $source_base ? {
+        default => $source_base,
+        undef   => 'puppet:///files',
+    }
+
     include ::ssh::params
 
     if $::kernel == 'windows' {
@@ -53,7 +61,7 @@ define ssh::key
     file { "ssh-key-${title}":
         ensure => $ensure,
         name   => $key_name,
-        source => "puppet:///files/ssh-${title}",
+        source => "${l_source_base}/ssh-${title}",
         owner  => $owner,
         group  => $group,
         mode   => $key_mode,
