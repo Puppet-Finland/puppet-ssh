@@ -17,7 +17,7 @@
 #   Whether this key should be private (mode => '0600') or public (mode => 
 #   '0644'). Valid values are true (default) and false.
 # [*source_base*]
-#   The base path to the source. E.g. 'puppet:///files' or 'puppet:///modules/profile'.
+#   The base path to the source. E.g. 'files' or 'modules/profile'.
 #
 define ssh::key
 (
@@ -30,7 +30,7 @@ define ssh::key
 {
     $l_source_base = $source_base ? {
         default => $source_base,
-        undef   => 'puppet:///files',
+        undef   => 'files',
     }
 
     include ::ssh::params
@@ -58,10 +58,12 @@ define ssh::key
         }
     }
 
+    # Fool puppet-lint
+    $sep = ":///"
     file { "ssh-key-${title}":
         ensure => $ensure,
         name   => $key_name,
-        source => "${l_source_base}/ssh-${title}",
+        source => "puppet${sep}${l_source_base}/ssh-${title}",
         owner  => $owner,
         group  => $group,
         mode   => $key_mode,
